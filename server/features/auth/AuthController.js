@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { toJsonWebToken } from '../../utils'
 class AuthController {
 
     async authorize(req, res) {
@@ -20,7 +21,13 @@ class AuthController {
                 'authorization': `token ${access_token}`
             }
         })
-        res.send(user.data)
+        const { login, avatar_url, email, name, id } = user.data
+        res.status(200).json({
+            token: toJsonWebToken({ login, avatar_url, email, name, id }),
+            user: {
+                login, avatar_url, email, name, id
+            }
+        })
     }
 
 }
