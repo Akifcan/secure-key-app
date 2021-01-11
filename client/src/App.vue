@@ -1,10 +1,18 @@
 <script>
-export default {};
+import AppNavbar from "@/components/AppNavbar.vue";
+
+export default {
+  components: {
+    AppNavbar,
+  },
+};
 </script>
 
 
 <template>
-  <div></div>
+  <div class="sb-nav-fixed">
+    <AppNavbar />
+  </div>
 </template>
 
 
