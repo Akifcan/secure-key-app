@@ -4,11 +4,11 @@ export default {
     const dropdownItems = [
       {
         title: "Hesap Ayarları",
-        to: "",
+        to: "accountSettings",
       },
       {
         title: "Hesap Aktiviteleri",
-        to: "",
+        to: "accountLogs",
       },
     ];
 
@@ -46,14 +46,15 @@ export default {
           class="dropdown-menu dropdown-menu-right"
           aria-labelledby="userDropdown"
         >
-          <a
+          <router-link
             v-for="dropdownItem in dropdownItems"
             :key="dropdownItem.title"
             class="dropdown-item"
+            :to="{ name: dropdownItem.to }"
             href="#"
           >
             {{ dropdownItem.title }}
-          </a>
+          </router-link>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="login.html">Çıkış Yap</a>
         </div>
