@@ -22,12 +22,7 @@ class AuthController {
             }
         })
         const { login, avatar_url, email, name, id } = user.data
-        res.status(200).json({
-            token: toJsonWebToken({ login, avatar_url, email, name, id }),
-            user: {
-                login, avatar_url, email, name, id
-            }
-        })
+        res.redirect(`http://localhost:8080/login?token=${toJsonWebToken({ login, avatar_url, email, name, id })}`)
     }
 
 }

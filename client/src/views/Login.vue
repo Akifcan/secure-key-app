@@ -1,7 +1,34 @@
 <script>
+import { useStore } from "vuex";
+import { useRoute, useRouter } from "vue-router";
 export default {
   setup() {
-    return {};
+    const store = useStore();
+    const route = useRoute();
+    const router = useRouter();
+
+    isTokenExist();
+
+    async function isTokenExist() {
+      if (route.query.token) {
+        const result = await store.dispatch(
+          "AuthModule/authorize",
+          route.query.token
+        );
+        if (result) {
+          router.push({ name: "home" });
+        }
+      }
+    }
+
+    function login() {
+      window.location.href =
+        "https://github.com/login/oauth/authorize?client_id=f38ddb59c8e338e28e06";
+    }
+
+    return {
+      login,
+    };
   },
 };
 </script>
@@ -24,7 +51,7 @@ export default {
                     </h3>
                   </div>
                   <div class="card-body">
-                    <button class="login-github-button">
+                    <button @click="login" class="login-github-button">
                       <i class="fab fa-github fa-2x"></i>
                       Github ile giriş yap
                     </button>
