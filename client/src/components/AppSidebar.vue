@@ -1,6 +1,12 @@
 <script>
+import { computed } from "vue";
+import { useStore } from "vuex";
 export default {
   setup() {
+    const store = useStore();
+
+    const user = computed(() => store.getters["AuthModule/user"]);
+
     const menus = [
       {
         categoryName: "Api Yönetimi",
@@ -39,6 +45,7 @@ export default {
     ];
 
     return {
+      user,
       menus,
     };
   },
@@ -108,8 +115,18 @@ export default {
         </div>
       </div>
       <div class="sb-sidenav-footer">
-        <div class="small">Logged in as:</div>
-        Start Bootstrap
+        <div class="text-center">
+          <img
+            height="50"
+            class="rounded-circle"
+            :src="user.avatar_url"
+            :alt="`${user.name} profil resmi`"
+          />
+        </div>
+
+        <div class="small">
+          <b>{{ user.name }}</b> olarak giriş yapıldı.
+        </div>
       </div>
     </nav>
   </div>

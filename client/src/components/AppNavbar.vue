@@ -1,6 +1,9 @@
 <script>
+import { removeToken } from "../utils";
+import { useRouter } from "vue-router";
 export default {
   setup() {
+    const router = useRouter();
     const dropdownItems = [
       {
         title: "Hesap Ayarları",
@@ -12,7 +15,13 @@ export default {
       },
     ];
 
+    function logout() {
+      removeToken();
+      router.push({ name: "login" });
+    }
+
     return {
+      logout,
       dropdownItems,
     };
   },
@@ -56,7 +65,7 @@ export default {
             {{ dropdownItem.title }}
           </router-link>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="login.html">Çıkış Yap</a>
+          <a class="dropdown-item" href="#" @click="logout">Çıkış Yap</a>
         </div>
       </li>
     </ul>
