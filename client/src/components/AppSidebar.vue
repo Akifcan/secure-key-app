@@ -125,7 +125,7 @@ export default {
         </div>
 
         <div class="small">
-          <b>{{ user.name }}</b> olarak giriş yapıldı.
+          <b>{{ user.name }} {{ user.id }} </b> olarak giriş yapıldı.
         </div>
       </div>
     </nav>

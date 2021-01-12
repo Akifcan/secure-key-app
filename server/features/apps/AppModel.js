@@ -18,6 +18,7 @@ const AppSchema = mongoose.Schema({
     blackList: [],
     whiteList: [],
     description: {
+        default: '',
         type: String,
         maxLength: 500
     }
