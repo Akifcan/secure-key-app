@@ -1,5 +1,5 @@
 import AppModel from './AppModel'
-import { validate } from '../../utils'
+import { validate, checkIpAddress } from '../../utils'
 
 class AppController {
 
@@ -70,23 +70,96 @@ class AppController {
     }
 
     deleteApp(req, res) {
-        res.send('delete app')
     }
 
-    addToBlackList(req, res) {
-        res.send('black list')
+    async addToBlackList(req, res) {
+        try {
+            const { id: _id } = req.params
+            const { ipAddress } = req.body
+            if (checkIpAddress(ipAddress)) {
+                const add = await AppModel.updateOne(
+                    { _id },
+                    {
+                        $push: { blackList: ipAddress }
+                    }
+                )
+                if (add.n == 1) {
+                    res.status(200).json({ status: true, message: `Kara listeye ${ipAddress} eklenmiştir ` })
+                } else {
+                    res.status(404).json({ status: false, message: 'Böyle bir uygulama bulunamadı' })
+                }
+            } else {
+                res.status(400).json({ status: false, message: 'Ip Adresi Formatını Hatalı Girdiniz' })
+            }
+
+        }
+        catch (error) {
+            console.log(error);
+            return next(new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin'))
+
+        }
     }
 
-    removeToBlackList(req, res) {
-        res.send('remove to black list')
+    async removeToBlackList(req, res) {
+        try {
+            const { id: _id } = req.params
+            const { ipAddress } = req.body
+
+            const remove = await AppModel.updateOne({ _id }, { $pull: { blackList: ipAddress } })
+            if (remove.n == 1) {
+                res.status(200).json({ status: true, message: `Kara listeden ${ipAddress} kaldırıldı` })
+            } else {
+                res.status(404).json({ status: false, message: 'Böyle bir uygulama bulunamadı' })
+            }
+
+        } catch (error) {
+            return next(new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin'))
+        }
     }
 
-    addToWhiteList(req, res) {
-        res.send('white list')
+    async addToWhiteList(req, res) {
+        try {
+            const { id: _id } = req.params
+            const { ipAddress } = req.body
+            if (checkIpAddress(ipAddress)) {
+                const add = await AppModel.updateOne(
+                    { _id },
+                    {
+                        $push: { whiteList: ipAddress }
+                    }
+                )
+                if (add.n == 1) {
+                    res.status(200).json({ status: true, message: `Beyaz listeye ${ipAddress} eklenmiştir ` })
+                } else {
+                    res.status(404).json({ status: false, message: 'Böyle bir uygulama bulunamadı' })
+                }
+            } else {
+                res.status(400).json({ status: false, message: 'Ip Adresi Formatını Hatalı Girdiniz' })
+            }
+
+        }
+        catch (error) {
+            console.log(error);
+            return next(new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin'))
+
+        }
     }
 
-    removeToWhiteList(req, res) {
-        res.send('remove to white list')
+    async removeToWhiteList(req, res) {
+        try {
+            const { id: _id } = req.params
+            const { ipAddress } = req.body
+
+            const remove = await AppModel.updateOne({ _id }, { $pull: { whiteList: ipAddress } })
+            if (remove.n == 1) {
+                res.status(200).json({ status: true, message: `Beyaz listeden ${ipAddress} kaldırıldı` })
+            } else {
+                res.status(404).json({ status: false, message: 'Böyle bir uygulama bulunamadı' })
+            }
+
+        } catch (error) {
+            return next(new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin'))
+        }
     }
 
 

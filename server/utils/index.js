@@ -6,6 +6,11 @@ export const toJsonWebToken = (obj) => {
 
 const emailRegex = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 
+export const checkIpAddress = (ip) => {
+    const re = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/g
+    return re.test(ip)
+}
+
 export const validate = (fields) => {
     const errors = []
     fields.forEach(field => {
