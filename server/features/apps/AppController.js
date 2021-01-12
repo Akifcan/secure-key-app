@@ -43,8 +43,30 @@ class AppController {
 
     }
 
-    listApps(req, res) {
-        res.send('list apps')
+    async listApps(req, res, next) {
+        try {
+            const { userid: userId } = req.headers
+            const apps = await AppModel.find({ userId })
+            res.status(200).json({ status: true, apps })
+        } catch (error) {
+            console.log(error);
+            return next(new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin'))
+        }
+    }
+
+    async listApp(req, res, next) {
+        const { id: _id } = req.params
+        try {
+            const app = await AppModel.findOne({ _id })
+            if (app) {
+                res.status(200).json({ status: true, app })
+            } else {
+                res.status(404).json({ status: false, message: 'Böyle bir uygulama bulunamadı' })
+            }
+        } catch (error) {
+            console.log(error);
+            return next(new Error('Beklenmedik bir hata oluştu lütfen tekrar deneyin'))
+        }
     }
 
     deleteApp(req, res) {
