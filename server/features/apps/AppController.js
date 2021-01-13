@@ -8,12 +8,28 @@ class AppController {
             const { name, apiKey, description } = req.body
             const { userid: userId } = req.headers
             const app = await AppModel.create({ name, apiKey, description, userId })
-            res.status(200).json({ status: true, message: 'Uygulamanız Oluşturulmuştur', app })
+            if (app.n == 1) {
+                res.status(200).json({ status: true, message: 'Uygulamanız Oluşturulmuştur', app })
+            } else {
+                next(new Error('Böyle bir uygulama bulunamadı'))
+            }
         } catch (error) {
             console.log(error);
             return next(new Error('Beklenemdik bir hata oluştu lütfen tekrar deneyin.'))
         }
 
+    }
+
+    async deleteApp(req, res, next) {
+        try {
+            const { id: _id } = req.params
+            const deleteApp = await AppModel.deleteOne({ _id })
+            console.log(deleteApp);
+            res.status(200).json({ status: true, message: 'Uygulamanız kaldırılmıştır' })
+        } catch (error) {
+            console.log(error);
+            return next(new Error('Beklenemdik bir hata oluştu lütfen tekrar deneyin.'))
+        }
     }
 
     async updateApp(req, res, next) {

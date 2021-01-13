@@ -11,6 +11,7 @@ router.post('/add-to-block-list/:id', ipIsValid, ipIsUnique, appController.addBl
 router.post('/add-to-allow-list/:id', ipIsValid, ipIsUnique, appController.addAllowList)
 router.post('/remove-to-block-list/:id', ipIsValid, appController.removeBlockList)
 router.post('/remove-to-allow-list/:id', ipIsValid, appController.removeAllowList)
+router.delete('/:id', appController.deleteApp)
 
 
 
