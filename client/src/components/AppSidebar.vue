@@ -32,7 +32,7 @@ export default {
         lists: [
           {
             title: "Hesap Ayarlarım",
-            icon: "fa fa-user",
+            icon: "fa fa-cogs",
             to: "accountSettings",
           },
           {

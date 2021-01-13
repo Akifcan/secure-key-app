@@ -13,6 +13,7 @@ const mutations = {
 const actions = {
     authorize(vuexContext, token) {
         vuexContext.commit('setUser', decodedJwt(token).obj)
+        localStorage.userId = decodedJwt(token).obj.id
         localStorage.userToken = token
         return true;
     }

@@ -1,0 +1,7 @@
+list logs on client [ x ]
+delete logs [  ]
+set user settings [  ]
+send api request [  ]
+log ip request [  ]
+group by date [  ]
+add actions on client [  ]
