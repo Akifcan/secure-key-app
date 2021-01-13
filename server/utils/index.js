@@ -1,9 +1,44 @@
 import jwt from 'jsonwebtoken'
+import axios from 'axios'
+import LogModel from '../features/logs/LogModel'
+import ip from 'ip'
+import AppModel from '../features/apps/AppModel'
 const emailRegex = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 
 
 export const toJsonWebToken = (obj) => {
     return jwt.sign({ obj }, process.env.JWT_SECRET_ID)
+}
+
+export const createLog = async ({ type, userId, description }) => {
+    console.log(ip.address());
+    const ipLocation = await getIpLocation('8.8.8.8')
+    const log = await LogModel.create({
+        description,
+        type,
+        userId,
+        ipLocation
+    })
+    return log
+}
+
+export const getAppName = async (_id) => {
+    const appName = await AppModel.findOne({ _id })
+    return appName.name
+}
+
+export const getIpLocation = async (ipAddress) => {
+
+    const response = await axios.get(`https://api.astroip.co/8.8.8.8?api_key=${process.env.ASTROIP_SERVICE}`)
+    const { continent_code, country_name, country_code, longitude, latitude } = response.data.geo
+    return {
+        continent_code,
+        country_name,
+        country_code,
+        longitude,
+        latitude
+    }
+
 }
 
 

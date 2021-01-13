@@ -1,4 +1,4 @@
-import { validate } from '../../utils'
+import { validate, createLog, getAppName } from '../../utils'
 import AppModel from './AppModel'
 
 class AppController {
@@ -8,11 +8,13 @@ class AppController {
             const { name, apiKey, description } = req.body
             const { userid: userId } = req.headers
             const app = await AppModel.create({ name, apiKey, description, userId })
-            if (app.n == 1) {
-                res.status(200).json({ status: true, message: 'Uygulamanız Oluşturulmuştur', app })
-            } else {
-                next(new Error('Böyle bir uygulama bulunamadı'))
-            }
+            res.status(200).json({ status: true, message: 'Uygulamanız Oluşturulmuştur', app })
+            createLog({
+                type: 'app',
+                userId,
+                description: `${name} adında yeni bir uygulama oluşturdunuz`
+            })
+
         } catch (error) {
             console.log(error);
             return next(new Error('Beklenemdik bir hata oluştu lütfen tekrar deneyin.'))
@@ -23,9 +25,15 @@ class AppController {
     async deleteApp(req, res, next) {
         try {
             const { id: _id } = req.params
-            const deleteApp = await AppModel.deleteOne({ _id })
-            console.log(deleteApp);
+            const { userid: userId } = req.headers
+            const appName = await getAppName(_id)
+            const deleteApp = await AppModel.deleteOne({ _id, userId })
             res.status(200).json({ status: true, message: 'Uygulamanız kaldırılmıştır' })
+            createLog({
+                type: 'app',
+                userId,
+                description: `${appName} uygulamasını kaldırdınız`
+            })
         } catch (error) {
             console.log(error);
             return next(new Error('Beklenemdik bir hata oluştu lütfen tekrar deneyin.'))
@@ -36,9 +44,12 @@ class AppController {
         try {
             const { name, apiKey, description, limit, time } = req.body
             const { id: _id } = req.params
+            const { userid: userId } = req.headers
+            const appName = await getAppName(_id)
             const app = await AppModel.updateOne(
                 {
-                    _id
+                    _id,
+                    userId
                 },
                 {
                     name,
@@ -50,6 +61,11 @@ class AppController {
             )
             if (app.n == 1) {
                 res.status(200).json({ status: true, message: 'Uygulamanız Güncellenmiştir' })
+                createLog({
+                    type: 'app',
+                    userId,
+                    description: `${appName} uygulamasını güncellediniz - (${name}) `
+                })
             } else {
                 return next(new Error('Bu uygulama bulunamadı'))
             }
@@ -74,6 +90,11 @@ class AppController {
             )
             if (add.n == 1) {
                 res.status(200).json({ status: true, message: `${ipAddress} yasaklı listesine eklendi.` })
+                createLog({
+                    type: 'app',
+                    userId,
+                    description: `${ipAddress}'ini yasaklı listeye eklediniz`
+                })
             } else {
                 return next(new Error('Bu uygulama bulunamadı'))
             }
@@ -98,6 +119,12 @@ class AppController {
             )
             if (add.n == 1) {
                 res.status(200).json({ status: true, message: `${ipAddress} izin verilen listesine eklendi.` })
+                createLog({
+                    type: 'app',
+                    userId,
+                    description: `${ipAddress}'ini izin verilen listeye eklediniz`
+                })
+
             } else {
                 return next(new Error('Bu uygulama bulunamadı'))
             }
@@ -122,6 +149,12 @@ class AppController {
             )
             if (add.n == 1) {
                 res.status(200).json({ status: true, message: `${ipAddress} izin verilen listesine kaldırıldı.` })
+                createLog({
+                    type: 'app',
+                    userId,
+                    description: `${ipAddress}'ini yasaklı listesinden kaldırdınız`
+                })
+
             } else {
                 return next(new Error('Bu uygulama bulunamadı'))
             }
@@ -146,6 +179,12 @@ class AppController {
             )
             if (add.n == 1) {
                 res.status(200).json({ status: true, message: `${ipAddress} yasaklı listesine kaldırıldı.` })
+                createLog({
+                    type: 'app',
+                    userId,
+                    description: `${ipAddress}'ini izin verilen listesinden kaldırdınız`
+                })
+
             } else {
                 return next(new Error('Bu uygulama bulunamadı'))
             }

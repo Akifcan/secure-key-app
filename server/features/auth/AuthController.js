@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { toJsonWebToken } from '../../utils'
+import { toJsonWebToken, createLog } from '../../utils'
 class AuthController {
 
     async authorize(req, res) {
@@ -23,6 +23,11 @@ class AuthController {
         })
         const { login, avatar_url, email, name, id } = user.data
         res.redirect(`http://localhost:8080/login?token=${toJsonWebToken({ login, avatar_url, email, name, id })}`)
+        createLog({
+            type: 'auth',
+            description: 'Giriş Yaptınız',
+            userId: id
+        })
     }
 
 }
