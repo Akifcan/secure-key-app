@@ -2,6 +2,7 @@ const IP_ADDRESS_REGEX = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/
 import AppModel from '../features/apps/AppModel'
 import { validate } from '../utils'
 
+
 export const ipIsValid = (req, res, next) => {
     if (IP_ADDRESS_REGEX.test(req.body.ipAddress)) {
         next()
@@ -63,4 +64,16 @@ export const nameIsUnique = async (req, res, next) => {
     }
 
 
+}
+
+export const apiControl = async (req, res, next) => {
+    const { slug, userId } = req.params
+    const api = await AppModel.findOne({ slug, userId }).select({ apiKey: 1, _id: 0 })
+    console.log(api);
+    if (api) {
+        req.api = api.apiKey
+        next()
+    } else {
+        next(new Error('Böyle bir servis bulunamadı'))
+    }
 }

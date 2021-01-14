@@ -1,4 +1,4 @@
-import { validate, createLog, getAppName } from '../../utils'
+import { createLog, getAppName } from '../../utils'
 import AppModel from './AppModel'
 
 class AppController {
@@ -21,6 +21,8 @@ class AppController {
         }
 
     }
+
+
 
     async deleteApp(req, res, next) {
         try {
