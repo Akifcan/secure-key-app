@@ -5,7 +5,7 @@ export default {
   setup() {
     const store = useStore();
     const logs = ref();
-    const filterCount = ref(10);
+    const filterCount = ref("");
 
     store.dispatch("LogModule/logs", 10);
 
@@ -30,6 +30,15 @@ export default {
       return showDate == dateNowFormatted ? "Bugün" : showDate;
     }
 
+    async function deleteLogs() {
+      const result = await store.dispatch("LogModule/removeAllLogs");
+      store.commit("showAlert", {
+        show: true,
+        text: result[1],
+        alertClass: result[0] ? "success" : "danger",
+      });
+    }
+
     function filterLogs(type) {
       if (type == "auth") {
         logs.value = computed(() => store.getters["LogModule/authLogs"]);
@@ -45,6 +54,7 @@ export default {
       filterLogs,
       formattedDate,
       logs,
+      deleteLogs,
     };
   },
 };
@@ -52,6 +62,27 @@ export default {
 
 <template>
   <AppBase :menuItems="['Ana Sayfa', 'Hesap Aktiviteleri']">
+    <AppModal title="Silme İşlemini Onayla">
+      <div class="modal-body">
+        <p>
+          Bütün geçmiş kayıtlarınızı <b>silmek</b> istediğinizden emin misiniz?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Kapat
+        </button>
+        <button
+          data-dismiss="modal"
+          aria-label="Close"
+          type="button"
+          class="btn btn-danger"
+          @click="deleteLogs"
+        >
+          Kayıtları Sil
+        </button>
+      </div>
+    </AppModal>
     <h1>Hesap Aktiviteleri</h1>
     <button @click="filterLogs('auth')" class="btn btn-primary">
       Giriş Geçmişi
@@ -62,20 +93,26 @@ export default {
     <button @click="filterLogs('all')" class="btn btn-info ml-2">
       Hepsini Göster
     </button>
-    <button class="btn btn-danger float-right">Hepsini Sil</button>
+    <button
+      data-toggle="modal"
+      data-target="#exampleModal"
+      class="btn btn-danger float-right"
+    >
+      Hepsini Sil
+    </button>
     <select v-model="filterCount" class="form-control mb-3 mt-3">
       <option value="3" selected="selected">Son 10 Kayıt</option>
       <option value="6">Son 20 Kayıt</option>
       <option value="all">Hepsini Göster</option>
     </select>
-
+    <AppAlert />
     <table class="table table-striped">
       <thead>
         <th>İşlem</th>
         <th>Tür</th>
         <th>Tarih</th>
       </thead>
-      <tbody>
+      <tbody v-if="logs.value.length">
         <tr v-for="log in logs.value" :key="log.id">
           <td>{{ log.description }}</td>
           <td>
@@ -91,6 +128,16 @@ export default {
             </button>
           </td>
           <td>{{ formattedDate(log.createdAt) }}</td>
+        </tr>
+      </tbody>
+      <tbody v-else>
+        <tr>
+          <td colspan="3">
+            <p class="d-flex">
+              <i class="fa fa-info-circle fa-2x mr-3"></i> Geçmiş Kayıtlarınız
+              Burada Görünür
+            </p>
+          </td>
         </tr>
       </tbody>
     </table>

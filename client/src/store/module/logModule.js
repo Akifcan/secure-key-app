@@ -20,6 +20,19 @@ const actions = {
             }
         })
         vuexContext.commit('setLogs', response.data)
+    },
+    async removeAllLogs(vuexContext) {
+        const response = await axios.delete(`${API}/log`, {
+            headers: {
+                'userid': localStorage.userId
+            }
+        })
+        if (response.status == 200) {
+            vuexContext.commit('setLogs', [])
+            return [true, response.data.message]
+        } else {
+            return [false, response.data.message]
+        }
     }
 }
 export default {
