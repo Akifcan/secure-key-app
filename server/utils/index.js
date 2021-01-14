@@ -29,7 +29,7 @@ export const getAppName = async (_id) => {
 
 export const getIpLocation = async (ipAddress) => {
 
-    const response = await axios.get(`https://api.astroip.co/8.8.8.8?api_key=${process.env.ASTROIP_SERVICE}`)
+    const response = await axios.get(`https://api.astroip.co/${ipAddress}?api_key=${process.env.ASTROIP_SERVICE}`)
     const { continent_code, country_name, country_code, longitude, latitude } = response.data.geo
     return {
         continent_code,

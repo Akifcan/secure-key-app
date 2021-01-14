@@ -1,5 +1,7 @@
 import { createLog, getAppName } from '../../utils'
 import AppModel from './AppModel'
+import AppLogModel from './AppLogModel'
+import mongoose from 'mongoose'
 
 class AppController {
 
@@ -81,6 +83,7 @@ class AppController {
     async addBlockList(req, res, next) {
         try {
             const { id: _id } = req.params
+            const { userid: userId } = req.headers
             const { ipAddress } = req.body
             const add = await AppModel.updateOne(
                 {
@@ -111,6 +114,7 @@ class AppController {
         try {
             const { id: _id } = req.params
             const { ipAddress } = req.body
+            const { userid: userId } = req.headers
             const add = await AppModel.updateOne(
                 {
                     _id
@@ -196,6 +200,36 @@ class AppController {
             return next(new Error('Beklenemdik bir hata oluştu lütfen tekrar deneyin.'))
         }
     }
+
+    async getAppLogs(req, res, next) {
+        try {
+            const { id: appId } = req.params
+            const logs = await AppLogModel.find({ appId })
+            res.status(200).json(logs)
+        } catch (error) {
+            console.log(error);
+            return next(new Error('Beklenemdik bir hata oluştu lütfen tekrar deneyin.'))
+        }
+    }
+
+    async getLogsByDate(req, res, next) {
+        const { id: appId } = req.params
+        const dates = await AppLogModel.aggregate(
+            [
+                {
+                    $match: { appId: mongoose.Types.ObjectId(appId) }
+                },
+                {
+                    $group: {
+                        _id: "$date",
+                        total: { $sum: 1 }
+                    }
+                }
+            ]
+        )
+        res.status(200).json(dates)
+    }
+
 
 }
 

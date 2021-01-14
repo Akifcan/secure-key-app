@@ -66,13 +66,41 @@ export const nameIsUnique = async (req, res, next) => {
 
 }
 
+let requestList = []
 export const apiControl = async (req, res, next) => {
+    console.log(requestList);
     const { slug, userId } = req.params
-    const api = await AppModel.findOne({ slug, userId }).select({ apiKey: 1, _id: 0 })
-    console.log(api);
+    const api = await AppModel.findOne({ slug, userId })
     if (api) {
-        req.api = api.apiKey
-        next()
+        const ipAddress = '8.8.8.9'
+        const { time, limit, blockList, allowList, _id } = api
+        const request = requestList.filter(item => item == _id)
+
+        if (request.length > limit) {
+            next(new Error('Lütfen daha sonra tekrar deneyin'))
+            setTimeout(() => {
+                requestList = requestList.filter(item => item != _id)
+                console.log('clear!');
+            }, time)
+        } else {
+            if (allowList.length) {
+                if (allowList.includes(ipAddress)) {
+                    req.api = api
+                    requestList.push(_id.toString())
+                    next()
+                } else {
+                    next(new Error('Bu servise erişim izniniz yok'))
+                }
+            } else {
+                if (blockList.includes(ipAddress)) {
+                    next(new Error('Bu servise erişim izniniz yok'))
+                } else {
+                    req.api = api
+                    requestList.push(_id.toString())
+                    next()
+                }
+            }
+        }
     } else {
         next(new Error('Böyle bir servis bulunamadı'))
     }
