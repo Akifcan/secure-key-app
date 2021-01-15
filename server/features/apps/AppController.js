@@ -24,6 +24,30 @@ class AppController {
 
     }
 
+    async listApps(req, res, next) {
+        try {
+            const { userid: userId } = req.headers
+            const apps = await AppModel.find({ userId })
+            res.status(200).json(apps)
+        } catch (error) {
+            return next(new Error('Beklenemdik bir hata oluştu lütfen tekrar deneyin.'))
+        }
+    }
+
+    async listApp(req, res, next) {
+        try {
+            const { id: _id } = req.params
+            const { userid: userId } = req.headers
+            const app = await AppModel.findOne({ _id, userId })
+            if (app) {
+                res.status(200).json(app)
+            } else {
+                return next(new Error('Böyle bir uygulama bulunamadı.'))
+            }
+        } catch (error) {
+            return next(new Error('Beklenemdik bir hata oluştu lütfen tekrar deneyin.'))
+        }
+    }
 
 
     async deleteApp(req, res, next) {
@@ -46,7 +70,6 @@ class AppController {
 
     async updateApp(req, res, next) {
         try {
-            const { name, apiKey, description, limit, time } = req.body
             const { id: _id } = req.params
             const { userid: userId } = req.headers
             const appName = await getAppName(_id)
@@ -55,20 +78,14 @@ class AppController {
                     _id,
                     userId
                 },
-                {
-                    name,
-                    apiKey,
-                    description,
-                    limit,
-                    time
-                }
+                req.body
             )
             if (app.n == 1) {
                 res.status(200).json({ status: true, message: 'Uygulamanız Güncellenmiştir' })
                 createLog({
                     type: 'app',
                     userId,
-                    description: `${appName} uygulamasını güncellediniz - (${name}) `
+                    description: `${appName} uygulamasını güncellediniz - (${req.body.name}) `
                 })
             } else {
                 return next(new Error('Bu uygulama bulunamadı'))
@@ -145,6 +162,8 @@ class AppController {
         try {
             const { id: _id } = req.params
             const { ipAddress } = req.body
+            const { userid: userId } = req.headers
+
             const add = await AppModel.updateOne(
                 {
                     _id
@@ -175,6 +194,7 @@ class AppController {
         try {
             const { id: _id } = req.params
             const { ipAddress } = req.body
+            const { userid: userId } = req.headers
             const add = await AppModel.updateOne(
                 {
                     _id
