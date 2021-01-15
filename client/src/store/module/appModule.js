@@ -1,17 +1,24 @@
 import axios from 'axios'
 import { API, HEADERS } from '../constants'
+import router from '../../router'
 
 const state = {
     apps: [],
+    appLogs: [],
+    logGroup: [],
     app: null
 }
 const getters = {
     apps: state => state.apps,
-    app: state => state.app
+    app: state => state.app,
+    logGroup: state => state.logGroup,
+    appLogs: state => state.appLogs
 }
 const mutations = {
     setApps: (state, apps) => state.apps = apps,
-    setApp: (state, app) => state.app = app
+    setApp: (state, app) => state.app = app,
+    setAppLogs: (state, logs) => state.appLogs = logs,
+    setLogGroup: (state, logGroup) => state.logGroup = logGroup,
 }
 const actions = {
     async createApp(vuexContext, { appName, appDescription, appApiKey }) {
@@ -36,6 +43,7 @@ const actions = {
             console.log(vuexContext.getters.apps);
         } catch (error) {
             console.log(error.response);
+            router.push({ name: 'error' })
             //redirect not found page
         }
     },
@@ -49,6 +57,7 @@ const actions = {
             vuexContext.commit('setApp', response.data)
         } catch (error) {
             //redirect not found page
+            router.push({ name: 'error' })
         }
     },
 
@@ -84,6 +93,35 @@ const actions = {
         } catch (error) {
             console.log(error.response);
             return [false, error.response.data.message]
+        }
+    },
+
+    async getAppLogs(vuexContext, id) {
+        const response = await axios.get(`${API}/app/app-logs/${id}`)
+        vuexContext.commit('setAppLogs', response.data)
+    },
+    async getAppLogsGroup(vuexContext, id) {
+        const response = await axios.get(`${API}/app/app-logs-date/${id}`)
+        vuexContext.commit('setLogGroup', response.data)
+    },
+
+    async deleteApp(vuexContext, id) {
+        const response = await axios.delete(`${API}/app/${id}`, {
+            headers: HEADERS
+        })
+        if (response.status == 200) {
+            vuexContext.dispatch('listApps')
+            router.push({ name: 'apiList' })
+        }
+    },
+
+    async deleteAllApps(vuexContext) {
+
+        const response = await axios.delete(`${API}/app/all`, {
+            headers: HEADERS
+        })
+        if (response.status == 200) {
+            return true
         }
     }
 

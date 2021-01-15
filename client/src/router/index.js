@@ -50,7 +50,16 @@ const routes = [
         component: () => import('@/components/account/AppAccountLogs'),
         name: 'accountLogs'
       },
-    ]
+      {
+        path: '/error',
+        component: () => import('@/components/AppError'),
+        name: 'error'
+      },
+      {
+        path: '/:pathMatch(.*)',
+        name: 'notFound',
+        redirect: { name: 'home' }
+      }]
   },
   {
     path: '/login',

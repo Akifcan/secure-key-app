@@ -1,6 +1,10 @@
 <script>
 export default {
   props: {
+    colspan: {
+      type: String,
+      default: 2,
+    },
     title: {
       type: String,
       default:
@@ -13,7 +17,7 @@ export default {
 <template>
   <tbody>
     <tr>
-      <td colspan="2">
+      <td :colspan="colspan">
         <p v-html="title"></p>
       </td>
     </tr>

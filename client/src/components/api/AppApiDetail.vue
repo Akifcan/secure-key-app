@@ -1,5 +1,5 @@
 <script>
-import { computed, ref, onMounted } from "vue";
+import { computed, ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import AppNotExist from "../AppNotExist";
@@ -11,7 +11,12 @@ export default {
     const route = useRoute();
     const store = useStore();
     store.dispatch("AppModule/listApp", route.params.id);
+    store.dispatch("AppModule/getAppLogs", route.params.id);
+    store.dispatch("AppModule/getAppLogsGroup", route.params.id);
     const app = computed(() => store.getters["AppModule/app"]);
+    const appLogs = computed(() => store.getters["AppModule/appLogs"]);
+    const appLogGroups = computed(() => store.getters["AppModule/logGroup"]);
+    const user = computed(() => store.getters["AuthModule/user"]);
 
     //fields
     const appName = ref(null);
@@ -106,7 +111,40 @@ export default {
       }
     }
 
+    function deleteApp() {
+      store.dispatch("AppModule/deleteApp", route.params.id);
+    }
+
+    var chart;
+
+    watch(appLogGroups, (newValue, oldValue) => {
+      const chartItems = ["Tarihe göre istekler"];
+      newValue.forEach((item) => chartItems.push(item.total));
+      chart.load({
+        columns: [chartItems],
+      });
+    });
+
+    onMounted(() => {
+      chart = bb.generate({
+        data: {
+          columns: [],
+          type: "bar", // for ESM specify as: bar()
+        },
+        bar: {
+          width: {
+            ratio: 0.5,
+          },
+        },
+        bindto: "#barChart",
+      });
+    });
+
     return {
+      deleteApp,
+      user,
+      appLogs,
+      appLogGroups,
       blockIpAddress,
       allowIpAddress,
       updateIpList,
@@ -127,9 +165,32 @@ export default {
 
 <template>
   <AppBase
-    v-if="app != null"
+    v-if="app != null && user != null"
     :menuItems="['Ana Sayfa', 'Uygulamalar', app.name]"
   >
+    <AppModal title="Silme İşlemini Onayla">
+      <div class="modal-body">
+        <p>
+          Bu uygulamayı kaldırmak istediğinizden emin misiniz? Uygulamalarınzda
+          hataya sebep olabilir.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Kapat
+        </button>
+        <button
+          data-dismiss="modal"
+          aria-label="Close"
+          type="button"
+          class="btn btn-danger"
+          @click="deleteApp"
+        >
+          Even Eminim
+        </button>
+      </div>
+    </AppModal>
+
     <div
       class="alert alert-primary"
       v-if="app.limit == 10 && app.time == 10000"
@@ -138,8 +199,15 @@ export default {
       tavsiye ederiz.
     </div>
 
-    <AppAlert></AppAlert>
+    <div class="alert alert-primary">
+      <p>
+        <b>Endpoint:</b> http://localhost:3000/api-service/{{ app.slug }}/{{
+          user.id
+        }}
+      </p>
+    </div>
 
+    <AppAlert></AppAlert>
     <h1 class="mb-2">{{ app.name }}</h1>
     <div class="row">
       <div class="col-md-6">
@@ -187,23 +255,25 @@ export default {
         </div>
         <div class="mt-5">
           <b>İstek Logları</b>
-          <table class="table table-striped">
+          <table class="table table-striped" v-if="appLogs">
             <thead>
               <th>Ip Adresi</th>
               <th>Tarih</th>
               <th>Ülke</th>
             </thead>
-            <tbody>
+            <tbody v-for="log in appLogs" :key="log._id">
               <tr>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>{{ log.ipAddress }}</td>
+                <td>{{ log.date }}</td>
+                <td>{{ log.ipLocation.country_name }}</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="mt-5">
+        <div class="mt-5" v-if="appLogGroups">
           <h1>Graphic!</h1>
+          {{ appLogGroups }}
+          <div id="barChart"></div>
         </div>
       </div>
       <div class="col-md-6">
@@ -309,6 +379,13 @@ export default {
             <AppNotExist v-if="!app.blockList.length"></AppNotExist>
           </table>
         </div>
+        <button
+          data-toggle="modal"
+          data-target="#exampleModal"
+          class="btn btn-danger btn-sm"
+        >
+          Uygulamayı Sil
+        </button>
       </div>
     </div>
   </AppBase>

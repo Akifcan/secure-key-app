@@ -68,6 +68,22 @@ class AppController {
         }
     }
 
+    async deleteAllApps(req, res, next) {
+        try {
+            const { userid: userId } = req.headers
+            const deleteApp = await AppModel.deleteMany({ userId })
+            res.status(200).json({ status: true, message: 'Uygulamalarınız kaldırılmıştır' })
+            createLog({
+                type: 'app',
+                userId,
+                description: `Bütün uygulamalarınızı kaldırdınız`
+            })
+        } catch (error) {
+            console.log(error);
+            return next(new Error('Beklenemdik bir hata oluştu lütfen tekrar deneyin.'))
+        }
+    }
+
     async updateApp(req, res, next) {
         try {
             const { id: _id } = req.params
@@ -162,8 +178,6 @@ class AppController {
         try {
             const { id: _id } = req.params
             const { ipAddress } = req.body
-            const { userid: userId } = req.headers
-
             const add = await AppModel.updateOne(
                 {
                     _id

@@ -1,7 +1,11 @@
 <script>
 import { useStore } from "vuex";
 import { computed } from "vue";
+import AppNotExist from "../AppNotExist";
 export default {
+  components: {
+    AppNotExist,
+  },
   setup() {
     const store = useStore();
     store.dispatch("AppModule/listApps");
@@ -42,11 +46,11 @@ export default {
           </td>
         </tr>
       </tbody>
-      <tbody v-else>
-        <tr>
-          <td colspan="3">Henüz bir uygulama oluşturmadınız</td>
-        </tr>
-      </tbody>
+      <AppNotExist
+        v-if="!apps.length"
+        colspan="4"
+        title="Henüz bir uygulama oluşturmadınız"
+      ></AppNotExist>
     </table>
   </AppBase>
 </template>
