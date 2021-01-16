@@ -15,3 +15,12 @@ Kullanacağımız teknolojiler: Vue.js, Node.js, MongoDB, Mongoose, Vuex, Bilboa
 Umarım bu projeyi beğenirsiniz ayrıca youtube kanalımdaki projelere de bakabilirsiniz. 
 Eğer bu projenin kaynak kodlarına erişmek isterseniz kurs içerisinden github repository üzerinden sorabilirsiniz. 
 Github repository üzerinden 17 adet branch'e ulaşacaksınız 1. branch uygulamamızın ilk hali yaptığımız kurulumlar ve 17. branch ise uygulamamızın final yani son hali.
+
+## Uygulamayı Kurmak İçin
+
+### Client ve Server Klasörleri İçerisinde
+`npm i`
+
+Serveri çalıştırmak için: `npm run dev`
+Clienti çalıştırmak için `npm run serve`
+ve mongodb veritabanı yolu.
