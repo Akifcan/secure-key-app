@@ -3,4 +3,16 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
-createApp(App).use(store).use(router).mount('#app')
+import AppBase from './components/AppBase'
+import AppModal from './components/AppModal'
+import AppAlert from './components/AppAlert'
+
+
+
+createApp(App)
+    .component('AppBase', AppBase)
+    .component('AppModal', AppModal)
+    .component('AppAlert', AppAlert)
+    .use(store)
+    .use(router)
+    .mount('#app')
