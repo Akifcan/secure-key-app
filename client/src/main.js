@@ -3,4 +3,10 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
-createApp(App).use(store).use(router).mount('#app')
+import AppBase from './components/AppBase'
+
+createApp(App)
+    .component('AppBase', AppBase)
+    .use(store)
+    .use(router)
+    .mount('#app')
